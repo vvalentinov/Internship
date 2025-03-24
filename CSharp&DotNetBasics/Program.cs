@@ -1,4 +1,5 @@
 ﻿using CSharp_DotNetBasics.Cars;
+using CSharp_DotNetBasics.Enumerable;
 using CSharp_DotNetBasics.Planes;
 
 var car = new Car(
@@ -70,4 +71,12 @@ if (hybridCar.IsFullyCharged == false)
 else
 {
     Console.WriteLine("The Hybrid car is fully charged and ready to go!");
+}
+
+// IEnumerable
+var customCollection = new CustomCollection(["first word", "second word", "third word"]);
+
+foreach (var item in customCollection)
+{
+    Console.WriteLine(item);
 }
