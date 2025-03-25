@@ -1,8 +1,10 @@
 ﻿namespace CSharp_DotNetBasics.Cars;
 
+using System;
+using System.Text.Json;
 using static Environment;
 
-public class Hybrid : Car
+public class Hybrid : Car, ICloneable
 {
     private int _batteryLevel;
 
@@ -40,6 +42,12 @@ public class Hybrid : Car
     }
 
     public bool IsFullyCharged { get { return BatteryLevel == 100; } }
+
+    public new object Clone()
+    {
+        var serializedObject = JsonSerializer.Serialize(this);
+        return JsonSerializer.Deserialize<Hybrid>(serializedObject);
+    }
 
     public override string GetInfo()
     {

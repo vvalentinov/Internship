@@ -1,12 +1,19 @@
 ﻿using CSharp_DotNetBasics.Cars;
-using CSharp_DotNetBasics.Enumerable;
 using CSharp_DotNetBasics.Planes;
+using CSharp_DotNetBasics.Enumerable;
 
 var car = new Car(
     make: "Toyota",
     model: "Corolla",
     topSpeed: 180,
     horsePower: 132);
+
+var carClone = car.Clone() as Car;
+if (carClone is not null)
+{
+    Console.WriteLine(car.GetInfo() == carClone.GetInfo());
+}
+
 car.Accelerate(50);
 Console.WriteLine(car.GetInfo());
 Console.WriteLine(car.StartEngine());
@@ -23,6 +30,12 @@ var hybridCar = new Hybrid(
 {
     BatteryLevel = 80
 };
+var hybridCarClone = hybridCar.Clone() as Hybrid;
+if (hybridCarClone is not null)
+{
+    Console.WriteLine(hybridCar.GetInfo() == hybridCarClone.GetInfo());
+}
+
 hybridCar.Accelerate(100);
 Console.WriteLine(hybridCar.GetInfo());
 Console.WriteLine(hybridCar.StartEngine());

@@ -2,7 +2,7 @@
 
 using static System.Environment;
 
-public class Car : Vehicle
+public class Car : Vehicle, ICloneable
 {
     public Car(
         string make,
@@ -43,4 +43,6 @@ public class Car : Vehicle
     }
 
     public virtual void FullStop() => CurrentSpeed = 0;
+
+    public object Clone() => MemberwiseClone();
 }
