@@ -86,10 +86,12 @@ else
     Console.WriteLine("The Hybrid car is fully charged and ready to go!");
 }
 
-// IEnumerable
-var customCollection = new CustomCollection(["first word", "second word", "third word"]);
+Console.WriteLine();
 
-foreach (var item in customCollection)
+// IEnumerable
+Console.WriteLine("Vehicle Collection IEnumerable: ");
+var vehicleCollection = new VehicleCollection([hybridCar, sportsCar, plane]);
+foreach (var vehicle in vehicleCollection)
 {
-    Console.WriteLine(item);
+    Console.WriteLine(vehicle.GetInfo());
 }

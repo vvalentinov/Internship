@@ -2,46 +2,44 @@
 
 using System.Collections;
 
-public class CustomCollection : IEnumerable<string>
+public class VehicleCollection : IEnumerable<Vehicle>
 {
-    public string[] Words { get; }
-
-    public CustomCollection(string[] words)
+    public VehicleCollection(Vehicle[] vehicles)
     {
-        Words = words;
+        Vehicles = vehicles;
     }
+
+    public Vehicle[] Vehicles { get; }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public IEnumerator<string> GetEnumerator() => new WordsEnumerator(Words);
+    public IEnumerator<Vehicle> GetEnumerator() => new WordsEnumerator(Vehicles);
 }
 
-public class WordsEnumerator : IEnumerator<string>
+public class WordsEnumerator : IEnumerator<Vehicle>
 {
     private const int InitialPosition = -1;
     private int _currentPosition = InitialPosition;
-    private readonly string[] _words;
+    private readonly Vehicle[] _vehicles;
 
-    public WordsEnumerator(string[] words)
+    public WordsEnumerator(Vehicle[] vehicles)
     {
-        _words = words;
+        _vehicles = vehicles;
     }
 
     object IEnumerator.Current => Current;
 
-    public string Current
+    public Vehicle Current
     {
         get
         {
             try
             {
-                return _words[_currentPosition];
+                return _vehicles[_currentPosition];
             }
             catch (IndexOutOfRangeException ex)
             {
-                throw new IndexOutOfRangeException(
-                    $"{nameof(CustomCollection)}'s end reached.",
-                    ex);
+                throw new IndexOutOfRangeException($"{nameof(VehicleCollection)}'s end reached.", ex);
             }
         }
     }
@@ -49,7 +47,7 @@ public class WordsEnumerator : IEnumerator<string>
     public bool MoveNext()
     {
         ++_currentPosition;
-        return _currentPosition < _words.Length;
+        return _currentPosition < _vehicles.Length;
     }
 
     public void Reset()
