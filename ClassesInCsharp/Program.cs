@@ -19,7 +19,7 @@ static void AnimalAction(
 
     // The "as" operator
     var bird = animal as Bird;
-    if (bird != null)
+    if (bird is not null)
     {
         Console.WriteLine($"{bird.Name} is a bird.");
     }
