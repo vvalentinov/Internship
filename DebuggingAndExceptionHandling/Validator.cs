@@ -1,6 +1,6 @@
 ﻿namespace DebuggingAndExceptionHandling;
 
-public class Validator
+public static class Validator
 {
     public static void AgeValidator(int age)
     {
