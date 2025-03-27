@@ -10,12 +10,17 @@ public class Service
     private static readonly AddressComparer _addressComparer = new();
     private static readonly EmployeeComparer _employeeComparer = new();
 
-    public static IEnumerable<EmployeeDepartmentDto> JoinEmployeeWithDepartment(
-        IEnumerable<Employee> employees,
-        IEnumerable<Department> departments)
+    private readonly IDatabase _db;
+
+    public Service(IDatabase database)
     {
-        var result = employees.Join(
-            departments,
+        _db = database;
+    }
+
+    public IEnumerable<EmployeeDepartmentDto> JoinEmployeeWithDepartment()
+    {
+        var result = _db.Employees.Join(
+            _db.Departments,
             employee => employee.Department.Id,
             department => department.Id,
             (employee, department) => new EmployeeDepartmentDto
@@ -28,12 +33,10 @@ public class Service
         return result;
     }
 
-    public static IEnumerable<DepartmentEmployeesDto> GroupJoinDepartmentsWithEmployees(
-        IEnumerable<Employee> employees,
-        IEnumerable<Department> departments)
+    public IEnumerable<DepartmentEmployeesDto> GroupJoinDepartmentsWithEmployees()
     {
-        var departmentGroups = departments.GroupJoin(
-            employees,
+        var departmentGroups = _db.Departments.GroupJoin(
+            _db.Employees,
             department => department.Id,
             employee => employee.Department.Id,
             (department, empGroup) => new DepartmentEmployeesDto
@@ -45,22 +48,19 @@ public class Service
         return departmentGroups;
     }
 
-    public static IEnumerable<string> GetEmployeeStreetInfo(
-        IEnumerable<Employee> employees,
-        IEnumerable<Address> addresses)
+    public IEnumerable<string> GetEmployeeStreetInfo()
     {
-        var result = employees.Zip(
-            addresses,
+        var result = _db.Employees.Zip(
+            _db.Addresses,
             (employee, address)
                 => $"{employee.Name} lives at {address.Street}.");
 
         return result;
     }
 
-    public static IEnumerable<AddressEmployeesDto> EmployeesGroupByAddresses(
-        IEnumerable<Employee> employees)
+    public IEnumerable<AddressEmployeesDto> EmployeesGroupByAddresses()
     {
-        var result = employees
+        var result = _db.Employees
             .GroupBy(employee => employee.Address)
             .Select(group => new AddressEmployeesDto
             {
@@ -71,7 +71,7 @@ public class Service
         return result;
     }
 
-    public static IEnumerable<Department> ConcatDepartments(IEnumerable<Department> departments)
+    public IEnumerable<Department> ConcatDepartments()
     {
         var otherDepartments = new List<Department>
         {
@@ -81,12 +81,12 @@ public class Service
             new() {Id = 9, Name = "Finance"},
         };
 
-        var result = departments.Concat(otherDepartments);
+        var result = _db.Departments.Concat(otherDepartments);
 
         return result;
     }
 
-    public static IEnumerable<Address> IntersectAddresses(IEnumerable<Address> addresses)
+    public IEnumerable<Address> IntersectAddresses()
     {
         var otherAdresses = new List<Address>
         {
@@ -96,14 +96,14 @@ public class Service
             new() {Id = 4, Street = "321 Market St"},
         };
 
-        var result = addresses.Intersect(
+        var result = _db.Addresses.Intersect(
             otherAdresses,
             _addressComparer);
 
         return result;
     }
 
-    public static IEnumerable<Department> UnionDepartments(IEnumerable<Department> departments)
+    public IEnumerable<Department> UnionDepartments()
     {
         var otherDepartments = new List<Department>
         {
@@ -113,17 +113,14 @@ public class Service
             new() {Id = 4, Name = "Logistics"},
         };
 
-        var result = departments.Union(
+        var result = _db.Departments.Union(
             otherDepartments,
             _departmentComparer);
 
         return result;
     }
 
-    public static IEnumerable<Employee> Except(
-        IEnumerable<Employee> employees,
-        IList<Department> departments,
-        IList<Address> addresses)
+    public IEnumerable<Employee> Except()
     {
         var otherEmployees = new List<Employee>
         {
@@ -131,76 +128,72 @@ public class Service
             {
                 Id = 1,
                 Name = "Alice Johnson",
-                Department = departments[0],
-                Address = addresses[0],
+                Department = _db.Departments[0],
+                Address = _db.Addresses[0],
             },
             new()
             {
                 Id = 2,
                 Name = "Bob Smith",
-                Department = departments[0],
-                Address = addresses[1]
+                Department = _db.Departments[0],
+                Address = _db.Addresses[1]
             },
             new()
             {
                 Id = 15,
                 Name = "Charlie Day",
-                Department = departments[1],
-                Address = addresses[2]
+                Department = _db.Departments[1],
+                Address = _db.Addresses[2]
             },
             new()
             {
                 Id = 47,
                 Name = "Diana Peters",
-                Department = departments[2],
-                Address = addresses[2]
+                Department = _db.Departments[2],
+                Address = _db.Addresses[2]
             }
         };
 
-        var result = employees.Except(
+        var result = _db.Employees.Except(
             otherEmployees,
             _employeeComparer);
 
         return result;
     }
 
-    public static int CountEmployeeNamesWithNameLengthLessThan(
-        IEnumerable<Employee> employees,
-        int length)
+    public int CountEmployeeNamesWithNameLengthLessThan(int length)
     {
-        return employees.Count(employee => employee.Name.Length < length);
+        return _db.Employees.Count(employee => employee.Name.Length < length);
     }
 
-    public static long CountEmployeeNamesWithNameBiggerOrEqualTo(
-        IEnumerable<Employee> employees,
-        int length)
+    public long CountEmployeeNamesWithNameBiggerOrEqualTo(int length)
     {
-        return employees.LongCount(employee => employee.Name.Length >= length);
+        return _db.Employees.LongCount(employee => employee.Name.Length >= length);
     }
 
-    public static int GetSmallestNameLengthOfAnEmployee(IEnumerable<Employee> employees)
+    public int GetSmallestNameLengthOfAnEmployee()
     {
-        return employees.Min(employee => employee.Name.Length);
+        return _db.Employees.Min(employee => employee.Name.Length);
     }
 
-    public static int GetBiggestNameLengthOfAnEmployee(IEnumerable<Employee> employees)
+    public int GetBiggestNameLengthOfAnEmployee()
     {
-        return employees.Max(employee => employee.Name.Length);
+        return _db.Employees.Max(employee => employee.Name.Length);
     }
 
-    public static double GetTotalSumOfEmployeesSalary(IEnumerable<Employee> employees)
+    public double GetTotalSumOfEmployeesSalary()
     {
-        return employees.Sum(employee => employee.Salary);
+        return _db.Employees.Sum(employee => employee.Salary);
     }
 
-    public static double GetAverageEmployeeSalary(IEnumerable<Employee> employees)
+    public double GetAverageEmployeeSalary()
     {
-        return employees.Average(employee => employee.Salary);
+        return _db.Employees.Average(employee => employee.Salary);
     }
 
-    public static string Aggregate(IEnumerable<Employee> employees)
+    public string Aggregate()
     {
-        var result = employees
+        var result = _db.Employees
             .Aggregate(
             "Salaries/Salaries After Tax: ",
             (result, employee)
@@ -210,40 +203,35 @@ public class Service
         return result;
     }
 
-    public static bool ContainsEmployee(
-        IEnumerable<Employee> employees,
-        IList<Department> departments,
-        IList<Address> addresses)
+    public bool ContainsEmployee()
     {
         var employee = new Employee
         {
             Id = 1,
             Name = "Alice Johnson",
-            Department = departments[0],
-            Address = addresses[0],
+            Department = _db.Departments[0],
+            Address = _db.Addresses[0],
             Salary = 1500.00,
         };
 
-        var result = employees.Contains(employee, _employeeComparer);
+        var result = _db.Employees.Contains(employee, _employeeComparer);
 
         return result;
     }
 
-    public static bool AnyAddressThatEndsWith(
-        IEnumerable<Address> addresses,
-        string input)
+    public bool AnyAddressThatEndsWith(string input)
     {
-        var result = addresses.Any(a => a.Street.EndsWith(input));
+        var result = _db.Addresses.Any(a => a.Street.EndsWith(input));
         return result;
     }
 
-    public static bool AllAddressesHaveAValidId(IEnumerable<Address> addresses)
+    public bool AllAddressesHaveAValidId()
     {
-        var result = addresses.All(a => a.Id > 0);
+        var result = _db.Addresses.All(a => a.Id > 0);
         return result;
     }
 
-    public static bool SequencesEqualExample(IEnumerable<Department> departments)
+    public bool SequencesEqualExample()
     {
         var otherDepartments = new List<Department>
         {
@@ -253,7 +241,10 @@ public class Service
             new() {Id = 4, Name = "Finance"},
         };
 
-        var result = departments.SequenceEqual(otherDepartments, _departmentComparer);
+        var result = _db.Departments.SequenceEqual(
+            otherDepartments,
+            _departmentComparer);
+
         return result;
 
     }
