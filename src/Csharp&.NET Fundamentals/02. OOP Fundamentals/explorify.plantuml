@@ -1,0 +1,161 @@
+@startuml Explorify
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+' === Entity Classes ===
+
+class User {
+  +Id: Guid
+  +Username: string
+  +Email: string
+  +ProfileImageUrl: string?
+  +Points: int
+}
+
+class Place {
+  +Id: Guid
+  +Name: string
+  +Description: string
+  +Latitude: double
+  +Longitude: double
+  +CountryId: int
+  +CategoryId: int
+  +UserId: Guid
+  +CreatedOn: DateTime
+  +ModifiedOn: DateTime
+  +DeleteOn: DateTime?
+  +IsDeleted: bool
+  +ThumbUrl: string
+  +IsApproved: bool
+  +IsCleaned: bool
+  +IsDeletedByAdmin: bool
+  +Address: string
+  +SlugifiedName: string
+}
+
+class Review {
+  +Id: Guid
+  +Content: string
+  +Rating: int
+  +Likes: int
+  +CreatedOn: DateTime
+  +ModifiedOn: DateTime
+  +IsDeleted: bool
+  +DeletedOn: DateTime?
+  +IsApproved: bool
+  +IsCleaned: bool
+  +IsDeletedByAdmin: bool
+  +UserId: Guid
+  +PlaceId: Guid
+}
+
+class ReviewLike {
+  +ReviewId: Guid
+  +UserId: Guid
+}
+
+class ReviewPhoto {
+  +Id: int
+  +Url: string
+  +ReviewId: Guid
+  +CreatedOn: DateTime
+  +ModifiedOn: DateTime
+  +IsDeleted: bool
+  +DeletedOn: DateTime?
+}
+
+class Category {
+  +Id: int
+  +Name: string
+  +Description: string
+  +ParentId: int
+  +CreatedOn: DateTime
+  +ModifiedOn: DateTime
+  +ImageUrl: string
+  +SlugifiedName: string
+}
+
+class Country {
+  +Id: int
+  +Name: string
+  +CreatedOn: DateTime
+  +ModifiedOn: DateTime
+}
+
+class PlaceImage {
+  +Id: Guid
+  +Url: string
+  +PlaceId: Guid
+  +CreatedOn: DateTime
+  +ModifiedOn: DateTime
+  +IsDeleted: bool
+  +DeletedOn: DateTime?
+}
+
+class Tag {
+  +Id: int
+  +Name: string
+  +CreatedOn: DateTime
+  +ModifiedOn: DateTime
+}
+
+class PlaceTags {
+  +PlaceId: Guid
+  +TagId: int
+}
+
+class UserFollow {
+  +FollowerId: Guid
+  +FolloweeId: Guid
+  +CreatedOn: DateTime
+  +ModifiedOn: DateTime
+  +IsDeleted: bool
+  +DeletedOn: DateTime?
+}
+
+class Badge {
+  +Id: int
+  +Name: string
+  +Description: string
+  +ImageUrl: string
+  +CreatedOn: DateTime
+  +ModifiedOn: DateTime
+  +IsDeleted: bool
+  +DeletedOn: DateTime?
+}
+
+class UserBadge {
+  +UserId: Guid
+  +BadgeId: int
+  +EarnedOn: DateTime
+}
+
+' === Relationships ===
+
+User "1" -- "0..*" Place : creates >
+User "1" -- "0..*" Review : writes >
+User "1" -- "0..*" UserBadge : earns >
+User "1" -- "0..*" UserFollow : follows >
+
+' User ↔ ReviewLike ↔ Review
+User "1" -- "0..*" ReviewLike : likes >
+Review "1" -- "0..*" ReviewLike
+
+' Review ↔ ReviewPhoto
+Review "1" -- "0..*" ReviewPhoto
+
+Place "1" -- "0..*" PlaceImage
+Place "1" -- "0..*" Review
+Place "1" -- "0..*" PlaceTags
+Place "1" --> "1" Country
+Place "1" --> "1" Category
+
+PlaceTags "1" -- "1" Tag : tags >
+PlaceTags "1" -- "1" Place : tagged >
+
+UserFollow "1" --> "1" User : follows >
+UserFollow "1" --> "1" User : followedBy >
+
+UserBadge --> Badge
+
+@enduml
